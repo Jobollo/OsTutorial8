@@ -21,6 +21,7 @@ struct proc_tree{
 };
 
 struct proc_tree *root = NULL;
+proc process;
 
 void insert(proc key, struct proc_tree **leaf)
 {
@@ -28,6 +29,9 @@ void insert(proc key, struct proc_tree **leaf)
     {
         *leaf = (struct proc_tree*) malloc( sizeof( struct proc_tree ) );
 	strcpy ((*leaf)->process.parent, key.parent);
+	strcpy ((*leaf)->process.name, key.name);
+	(*leaf)->process.priority = key.priority;
+	(*leaf)->process.memory = key.memory;
         (*leaf)->left = NULL;
         (*leaf)->right = NULL;
     }else{
@@ -38,16 +42,22 @@ void insert(proc key, struct proc_tree **leaf)
 	    else if(strcmp(key.parent, (*leaf)->process.parent) > 0)
 	    {
 		insert( key, &(*leaf)->right );
+	    }else{
+	        insert( key, &(*leaf)->left);
 	    }
     }
 }
 
-void in_order(struct proc_tree *p_root)
+void in_order(struct proc_tree *n)
 {
-    if( p_root != NULL ) {
-        in_order(p_root->left);
-        printf("   %s %s %d %d\n", p_root->process.parent,p_root->process.name,p_root->process.priority,p_root->process.memory);     
-        in_order(p_root->right);
+    if(n->left)
+    {
+	in_order(n->left);
+    }
+    printf("   %s %s %d %d\n", n->process.parent,n->process.name,n->process.priority,n->process.memory);     
+    if(n->right)
+    {
+	in_order(n->right);
     }
 }
 
@@ -60,7 +70,6 @@ int main(void)
 	char *token;
 	int i;
 	char* data;
-	proc process;
 	if(fp != NULL)
 	{
 		while(fgets(buffer, sizeof buffer, fp) != NULL)
